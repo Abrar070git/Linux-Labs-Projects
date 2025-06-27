@@ -1,0 +1,29 @@
+Question:
+
+The Aquila DevOps team has developed automation scripts to streamline routine operational tasks. Before deploying these scripts across all backend servers in the Orion data center, they want to perform a test run using a sample cron job. Please complete the following steps:
+
+a. Install the cronie package and ensure the crond service is started on all Orion backend servers.
+
+b. Configure a cron job for the root user to execute the command echo hello > /tmp/cron_text every 5 minutes.
+
+Solution:
+
+sudo dnf install -y cronie   ---> to install it
+
+sudo systemctl start crond
+sudo systemc enable crond 
+
+sudo crontab -e   ---> Open the root user's crontab:
+
+*/5 * * * * echo hello > /tmp/cron_text  ---> Add the following line to the crontab file save and exit:
+
+sudo crontab -l  ----> Check the crontab to confirm the job is added:
+
+To Verify It's Working
+
+Wait 5–10 minutes and check the content of the file:
+
+cat /tmp/cron_text
+
+
+
