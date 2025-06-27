@@ -1,0 +1,32 @@
+Task Description:
+
+During a recent compliance audit, it was identified that multiple servers in the Phoenix data center are missing a valid login banner. The security team has supplied several approved banner templates that must be implemented across the environment to meet compliance standards. These banners will be displayed to users upon successful login.
+
+Please update the Message of the Day (MOTD) on all web and database servers used by the Titan project. Use the approved banner template located at /home/odin/titan_banner on the jump host.
+
+
+Solution:
+
+Run these commands one by one on the jump host:
+
+scp /home/odin/titan_banner tony@stapp01:/home/tony/
+sudo cp /home/tony/titan_banner /etc/motd
+
+scp -r /home/odin/titan_banner steve@stapp02:/home/steve/
+sudo cp /home/steve/titan_banner /etc/motd
+
+scp -r /home/odin/titan_banner tony@stapp01:/home/tony/
+sudo cp /home/banner/titan_banner /etc/motd
+
+scp /home/odin/titan_banner peter@stdb01:/home/peter/
+sudo cp /home/peter/titan_banner /etc/motd
+
+Verify it:
+
+ssh tony@stapp01
+
+Enter the password to redirect it:
+
+cat /home/odin/titan_banner
+cat /etc/motd
+
