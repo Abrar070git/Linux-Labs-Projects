@@ -1,0 +1,27 @@
+Question:
+
+The Nautilus team requires their data to remain strictly confidential and accessible only to members of their dbadmin group, due to security concerns. To support this:
+
+Set up a collaborative directory at /dbadmin/data on App Server 2 in the Stratos Datacenter.
+
+The directory must be group-owned by the dbadmin group.
+
+All files created within this directory should also be owned by the dbadmin group by default.
+
+Permissions should be set so that only the directory's owner and group members have read, write, and execute access.
+
+No access should be granted to others.
+
+Solution:
+
+ssh steve@stapp02
+
+enter the password:
+
+sudo mkdir -p /dbadmin/data
+
+sudo chmod 770 /dbadmin/data
+
+sudo chown :dbadmin /dbadmin/data
+
+ls -l /dbadmin/data
