@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: abrar
+  name: abrar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: abrar
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: abrar
+    spec:
+      containers:
+      - image: nginx:latest
+        name: nginx
+        ports:
+        - containerPort: 8080
+        resources: {}
+status: {}
