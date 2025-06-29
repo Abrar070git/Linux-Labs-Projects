@@ -1,0 +1,335 @@
+QUESTION:
+
+The Nautilus production support team and security team had a meeting last month in which they decided to use local yum repositories for maintaing packages needed for their servers. For now they have decided to configure a local yum repo on Nautilus Backup Server. This is one of the pending items from last month, so please configure a local yum repository on Nautilus Backup Server as per details given below.
+
+a. We have some packages already present at location /packages/downloaded_rpms/ on Nautilus Backup Server.
+
+b. Create a yum repo named epel_local and make sure to set Repository ID to epel_local. Configure it to use package's location /packages/downloaded_rpms/.
+
+c. Install package wget from this newly created repo.
+
+1. Login to Backup server
+	ssh clint@stbkp01
+
+	2. Verify packages for local repo seting up
+	cd /packages/downloaded_rpms/
+
+	ls -ahl
+			total 52M
+			drwxr-xr-x 1 root root 4.0K Jan 28  2020 .
+			drwxr-xr-x 1 root root 4.0K Jan 28  2020 ..
+			-rw-r--r-- 1 root root 104K Aug 22  2019 apr-1.4.8-5.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  92K Jul  4  2014 apr-util-1.5.2-6.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  62K Apr 25  2018 avahi-libs-0.6.31-19.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  22M Sep 30  2015 centos-logos-70.0.6-3.el7.centos.noarch.rpm
+			-rw-r--r-- 1 root root 358K Aug 22  2019 cups-libs-1.6.3-40.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  33K Aug 22  2019 gpm-libs-1.20.7-6.el7.x86_64.rpm
+			-rw-r--r-- 1 root root 942K Jul  4  2014 groff-base-1.22.2-8.el7.x86_64.rpm
+			-rw-r--r-- 1 root root 2.8M Aug 22  2019 httpd-2.4.6-90.el7.centos.x86_64.rpm
+			-rw-r--r-- 1 root root  91K Aug 22  2019 httpd-tools-2.4.6-90.el7.centos.x86_64.rpm
+			-rw-r--r-- 1 root root  37K Aug 10  2017 jansson-2.10-1.el7.x86_64.rpm
+			-rw-r--r-- 1 root root 144K Aug 22  2019 libldb-1.4.2-1.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  33K Aug 22  2019 libtalloc-2.1.14-1.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  49K Aug 22  2019 libtdb-1.3.16-1.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  40K Aug 22  2019 libtevent-0.9.37-1.el7.x86_64.rpm
+			-rw-r--r-- 1 root root 112K Dec  3  2019 libwbclient-4.9.1-10.el7_7.x86_64.rpm
+			-rw-r--r-- 1 root root  31K Jul  4  2014 mailcap-2.1.41-2.el7.noarch.rpm
+			-rw-r--r-- 1 root root 8.0M Jan 24  2019 perl-5.16.3-294.el7_6.x86_64.rpm
+			-rw-r--r-- 1 root root  20K Jul  4  2014 perl-Carp-1.26-244.el7.noarch.rpm
+			-rw-r--r-- 1 root root  19K Jul  4  2014 perl-constant-1.27-2.el7.noarch.rpm
+			-rw-r--r-- 1 root root 1.5M Jul  4  2014 perl-Encode-2.51-7.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  29K Jul  4  2014 perl-Exporter-5.68-3.el7.noarch.rpm
+			-rw-r--r-- 1 root root  27K Jul  4  2014 perl-File-Path-2.09-2.el7.noarch.rpm
+			-rw-r--r-- 1 root root  57K Jul  4  2014 perl-File-Temp-0.23.01-3.el7.noarch.rpm
+			-rw-r--r-- 1 root root  77K Jul  4  2014 perl-Filter-1.49-3.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  56K Apr 25  2018 perl-Getopt-Long-2.40-3.el7.noarch.rpm
+			-rw-r--r-- 1 root root  39K Jul  4  2014 perl-HTTP-Tiny-0.033-3.el7.noarch.rpm
+			-rw-r--r-- 1 root root 689K Jan 24  2019 perl-libs-5.16.3-294.el7_6.x86_64.rpm
+			-rw-r--r-- 1 root root  44K Jan 24  2019 perl-macros-5.16.3-294.el7_6.x86_64.rpm
+			-rw-r--r-- 1 root root  13K Jul  4  2014 perl-parent-0.225-244.el7.noarch.rpm
+			-rw-r--r-- 1 root root  83K Jul  4  2014 perl-PathTools-3.40-5.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  52K Jan 24  2019 perl-Pod-Escapes-1.04-294.el7_6.noarch.rpm
+			-rw-r--r-- 1 root root 112K Jul  4  2014 perl-podlators-2.5.1-3.el7.noarch.rpm
+			-rw-r--r-- 1 root root  87K Jul  4  2014 perl-Pod-Perldoc-3.20-4.el7.noarch.rpm
+			-rw-r--r-- 1 root root 217K Jul  4  2014 perl-Pod-Simple-3.28-4.el7.noarch.rpm
+			-rw-r--r-- 1 root root  27K Jul  4  2014 perl-Pod-Usage-1.63-3.el7.noarch.rpm
+			-rw-r--r-- 1 root root  36K Jul  4  2014 perl-Scalar-List-Utils-1.27-248.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  49K Nov 20  2016 perl-Socket-2.010-4.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  78K Jul  4  2014 perl-Storable-2.45-3.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  14K Jul  4  2014 perl-Text-ParseWords-3.29-4.el7.noarch.rpm
+			-rw-r--r-- 1 root root  50K Jul  4  2014 perl-threads-1.87-4.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  39K Jul  4  2014 perl-threads-shared-1.43-6.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  46K Jul  4  2014 perl-Time-HiRes-1.9725-3.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  25K Jul  4  2014 perl-Time-Local-1.2300-2.el7.noarch.rpm
+			-rw-r--r-- 1 root root  18K Aug 22  2019 pytalloc-2.1.14-1.el7.x86_64.rpm
+			drwxr-xr-x 2 root root 4.0K Jan 28  2020 repodata
+			-rw-r--r-- 1 root root 686K Dec  3  2019 samba-4.9.1-10.el7_7.x86_64.rpm
+			-rw-r--r-- 1 root root 5.0M Dec  3  2019 samba-client-libs-4.9.1-10.el7_7.x86_64.rpm
+			-rw-r--r-- 1 root root 210K Dec  3  2019 samba-common-4.9.1-10.el7_7.noarch.rpm
+			-rw-r--r-- 1 root root 171K Dec  3  2019 samba-common-libs-4.9.1-10.el7_7.x86_64.rpm
+			-rw-r--r-- 1 root root 456K Dec  3  2019 samba-common-tools-4.9.1-10.el7_7.x86_64.rpm
+			-rw-r--r-- 1 root root 261K Dec  3  2019 samba-libs-4.9.1-10.el7_7.x86_64.rpm
+			-rw-r--r-- 1 root root 6.0M Aug 22  2019 vim-common-7.4.629-6.el7.x86_64.rpm
+			-rw-r--r-- 1 root root 1.1M Aug 22  2019 vim-enhanced-7.4.629-6.el7.x86_64.rpm
+			-rw-r--r-- 1 root root  11K Aug 22  2019 vim-filesystem-7.4.629-6.el7.x86_64.rpm
+			-rw-r--r-- 1 root root 548K May 16  2019 wget-1.14-18.el7_6.1.x86_64.rpm
+			-rw-r--r-- 1 root root  41K Jul  4  2014 which-2.20-7.el7.x86_64.rpm
+
+	3. Login to Root for creating local repo configuration file
+	sudo su -
+
+	4. Verify repolist for any additional repo to download the package
+	#yum repolist
+		Loaded plugins: fastestmirror, ovl
+		Determining fastest mirrors
+		repolist: 0
+
+	5. Create local repo configuration file
+	# vi /etc/yum.repos.d/localyum.repo
+		[localyum]
+		name=localyum
+		baseurl=file:///packages/downloaded_rpms/
+		enabled = 1
+		gpgcheck = 0
+
+	6. Verify the repo configuration file
+	# cat /etc/yum.repos.d/localyum.repo
+		[localyum]
+		name=localyum
+		baseurl=file:///packages/downloaded_rpms/
+		enabled = 1
+		gpgcheck = 0
+
+	7. Verify repolist to check new local repo is included
+	# yum repolist
+		Loaded plugins: fastestmirror, ovl
+		Loading mirror speeds from cached hostfile
+		localyum                                                                                                              | 2.9 kB  00:00:00     
+		localyum/primary_db                                                                                                   |  57 kB  00:00:00     
+		repo id                                                            repo name                                                           status
+		localyum                                                           localyum                                                            55
+		repolist: 55
+
+	8. Install package samba from local repo
+	# yum install samba --enablerepo='localyum'
+			Loaded plugins: fastestmirror, ovl
+			Loading mirror speeds from cached hostfile
+			Resolving Dependencies
+			--> Running transaction check
+			---> Package samba.x86_64 0:4.9.1-10.el7_7 will be installed
+			--> Processing Dependency: samba-libs = 4.9.1-10.el7_7 for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: samba-common-tools = 4.9.1-10.el7_7 for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: samba-common-libs = 4.9.1-10.el7_7 for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: samba-common = 4.9.1-10.el7_7 for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: samba-common = 4.9.1-10.el7_7 for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: samba-client-libs = 4.9.1-10.el7_7 for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libwbclient = 4.9.1-10.el7_7 for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libxattr-tdb-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libutil-tdb-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libutil-reg-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libtevent.so.0(TEVENT_0.9.9)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libtevent.so.0(TEVENT_0.9.21)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libtevent.so.0(TEVENT_0.9.16)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libtevent-util.so.0(TEVENT_UTIL_0.0.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libtdb.so.1(TDB_1.2.5)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libtdb.so.1(TDB_1.2.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libtalloc.so.2(TALLOC_2.0.2)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsys-rw-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsocket-blocking-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsmbd-shim-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsmbd-base-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsmbconf.so.0(SMBCONF_0)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsmb-transport-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libserver-id-db-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsecrets3-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba3-util-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-util.so.0(SAMBA_UTIL_0.0.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-sockets-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-security-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-passdb.so.0(SAMBA_PASSDB_0.2.0)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-hostconfig.so.0(SAMBA_HOSTCONFIG_0.0.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-errors.so.1(SAMBA_ERRORS_1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-debug-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-cluster-support-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libreplace-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libpopt-samba3-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libndr.so.0(NDR_0.0.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libndr-standard.so.0(NDR_STANDARD_0.0.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libndr-samba-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libndr-nbt.so.0(NDR_NBT_0.0.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libmsghdr-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libmessages-dgm-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: liblibsmb-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libgse-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libgenrand-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libdbwrap-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libcmdline-contexts-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libcliauth-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libcli-smb-common-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libcli-nbt-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libcli-cldap-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libauth-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libCHARSET3-samba4.so(SAMBA_4.9.1)(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libxattr-tdb-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libutil-tdb-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libutil-reg-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libtevent.so.0()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libtevent-util.so.0()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libtdb.so.1()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libtalloc.so.2()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsys-rw-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsocket-blocking-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsmbd-shim-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsmbd-base-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsmbconf.so.0()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsmb-transport-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libserver-id-db-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsecrets3-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba3-util-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-util.so.0()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-sockets-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-security-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-passdb.so.0()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-hostconfig.so.0()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-errors.so.1()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-debug-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libsamba-cluster-support-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libreplace-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libpopt-samba3-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libndr.so.0()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libndr-standard.so.0()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libndr-samba-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libndr-nbt.so.0()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libmsghdr-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libmessages-dgm-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: liblibsmb-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libgse-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libgenrand-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libdbwrap-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libcmdline-contexts-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libcliauth-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libcli-smb-common-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libcli-nbt-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libcli-cldap-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libauth-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libCHARSET3-samba4.so()(64bit) for package: samba-4.9.1-10.el7_7.x86_64
+			--> Running transaction check
+			---> Package libtalloc.x86_64 0:2.1.14-1.el7 will be installed
+			---> Package libtdb.x86_64 0:1.3.16-1.el7 will be installed
+			---> Package libtevent.x86_64 0:0.9.37-1.el7 will be installed
+			---> Package libwbclient.x86_64 0:4.9.1-10.el7_7 will be installed
+			---> Package samba-client-libs.x86_64 0:4.9.1-10.el7_7 will be installed
+			--> Processing Dependency: libldb.so.1(LDB_1.3.0)(64bit) for package: samba-client-libs-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libldb.so.1(LDB_1.1.30)(64bit) for package: samba-client-libs-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libldb.so.1(LDB_1.1.19)(64bit) for package: samba-client-libs-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libldb.so.1(LDB_1.1.1)(64bit) for package: samba-client-libs-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libldb.so.1(LDB_0.9.23)(64bit) for package: samba-client-libs-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libldb.so.1(LDB_0.9.15)(64bit) for package: samba-client-libs-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libldb.so.1(LDB_0.9.10)(64bit) for package: samba-client-libs-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libldb.so.1()(64bit) for package: samba-client-libs-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libjansson.so.4()(64bit) for package: samba-client-libs-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libcups.so.2()(64bit) for package: samba-client-libs-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libavahi-common.so.3()(64bit) for package: samba-client-libs-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libavahi-client.so.3()(64bit) for package: samba-client-libs-4.9.1-10.el7_7.x86_64
+			---> Package samba-common.noarch 0:4.9.1-10.el7_7 will be installed
+			---> Package samba-common-libs.x86_64 0:4.9.1-10.el7_7 will be installed
+			---> Package samba-common-tools.x86_64 0:4.9.1-10.el7_7 will be installed
+			---> Package samba-libs.x86_64 0:4.9.1-10.el7_7 will be installed
+			--> Processing Dependency: libpytalloc-util.so.2(PYTALLOC_UTIL_2.1.9)(64bit) for package: samba-libs-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libpytalloc-util.so.2(PYTALLOC_UTIL_2.1.6)(64bit) for package: samba-libs-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libpytalloc-util.so.2(PYTALLOC_UTIL_2.0.6)(64bit) for package: samba-libs-4.9.1-10.el7_7.x86_64
+			--> Processing Dependency: libpytalloc-util.so.2()(64bit) for package: samba-libs-4.9.1-10.el7_7.x86_64
+			--> Running transaction check
+			---> Package avahi-libs.x86_64 0:0.6.31-19.el7 will be installed
+			---> Package cups-libs.x86_64 1:1.6.3-40.el7 will be installed
+			---> Package jansson.x86_64 0:2.10-1.el7 will be installed
+			---> Package libldb.x86_64 0:1.4.2-1.el7 will be installed
+			---> Package pytalloc.x86_64 0:2.1.14-1.el7 will be installed
+			--> Finished Dependency Resolution
+
+			Dependencies Resolved
+
+			=============================================================================================================================================
+			 Package                                 Arch                        Version                             Repository                     Size
+			=============================================================================================================================================
+			Installing:
+			 samba                                   x86_64                      4.9.1-10.el7_7                      localyum                      685 k
+			Installing for dependencies:
+			 avahi-libs                              x86_64                      0.6.31-19.el7                       localyum                       61 k
+			 cups-libs                               x86_64                      1:1.6.3-40.el7                      localyum                      358 k
+			 jansson                                 x86_64                      2.10-1.el7                          localyum                       37 k
+			 libldb                                  x86_64                      1.4.2-1.el7                         localyum                      144 k
+			 libtalloc                               x86_64                      2.1.14-1.el7                        localyum                       32 k
+			 libtdb                                  x86_64                      1.3.16-1.el7                        localyum                       48 k
+			 libtevent                               x86_64                      0.9.37-1.el7                        localyum                       40 k
+			 libwbclient                             x86_64                      4.9.1-10.el7_7                      localyum                      111 k
+			 pytalloc                                x86_64                      2.1.14-1.el7                        localyum                       17 k
+			 samba-client-libs                       x86_64                      4.9.1-10.el7_7                      localyum                      4.9 M
+			 samba-common                            noarch                      4.9.1-10.el7_7                      localyum                      210 k
+			 samba-common-libs                       x86_64                      4.9.1-10.el7_7                      localyum                      171 k
+			 samba-common-tools                      x86_64                      4.9.1-10.el7_7                      localyum                      456 k
+			 samba-libs                              x86_64                      4.9.1-10.el7_7                      localyum                      260 k
+
+			Transaction Summary
+			=============================================================================================================================================
+			Install  1 Package (+14 Dependent packages)
+
+			Total download size: 7.5 M
+			Installed size: 25 M
+			Is this ok [y/d/N]: y
+			Downloading packages:
+			---------------------------------------------------------------------------------------------------------------------------------------------
+			Total                                                                                                        242 MB/s | 7.5 MB  00:00:00     
+			Running transaction check
+			Running transaction test
+			Transaction test succeeded
+			Running transaction
+			  Installing : libtalloc-2.1.14-1.el7.x86_64                                                                                            1/15 
+			  Installing : libtdb-1.3.16-1.el7.x86_64                                                                                               2/15 
+			  Installing : libtevent-0.9.37-1.el7.x86_64                                                                                            3/15 
+			  Installing : samba-common-4.9.1-10.el7_7.noarch                                                                                       4/15 
+			  Installing : libldb-1.4.2-1.el7.x86_64                                                                                                5/15 
+			  Installing : avahi-libs-0.6.31-19.el7.x86_64                                                                                          6/15 
+			  Installing : 1:cups-libs-1.6.3-40.el7.x86_64                                                                                          7/15 
+			  Installing : pytalloc-2.1.14-1.el7.x86_64                                                                                             8/15 
+			  Installing : jansson-2.10-1.el7.x86_64                                                                                                9/15 
+			  Installing : libwbclient-4.9.1-10.el7_7.x86_64                                                                                       10/15 
+			  Installing : samba-common-libs-4.9.1-10.el7_7.x86_64                                                                                 11/15 
+			  Installing : samba-client-libs-4.9.1-10.el7_7.x86_64                                                                                 12/15 
+			  Installing : samba-libs-4.9.1-10.el7_7.x86_64                                                                                        13/15 
+			  Installing : samba-common-tools-4.9.1-10.el7_7.x86_64                                                                                14/15 
+			  Installing : samba-4.9.1-10.el7_7.x86_64                                                                                             15/15 
+			  Verifying  : samba-4.9.1-10.el7_7.x86_64                                                                                              1/15 
+			  Verifying  : samba-client-libs-4.9.1-10.el7_7.x86_64                                                                                  2/15 
+			  Verifying  : libtalloc-2.1.14-1.el7.x86_64                                                                                            3/15 
+			  Verifying  : pytalloc-2.1.14-1.el7.x86_64                                                                                             4/15 
+			  Verifying  : libtdb-1.3.16-1.el7.x86_64                                                                                               5/15 
+			  Verifying  : 1:cups-libs-1.6.3-40.el7.x86_64                                                                                          6/15 
+			  Verifying  : samba-libs-4.9.1-10.el7_7.x86_64                                                                                         7/15 
+			  Verifying  : libwbclient-4.9.1-10.el7_7.x86_64                                                                                        8/15 
+			  Verifying  : avahi-libs-0.6.31-19.el7.x86_64                                                                                          9/15 
+			  Verifying  : libldb-1.4.2-1.el7.x86_64                                                                                               10/15 
+			  Verifying  : samba-common-tools-4.9.1-10.el7_7.x86_64                                                                                11/15 
+			  Verifying  : libtevent-0.9.37-1.el7.x86_64                                                                                           12/15 
+			  Verifying  : samba-common-4.9.1-10.el7_7.noarch                                                                                      13/15 
+			  Verifying  : samba-common-libs-4.9.1-10.el7_7.x86_64                                                                                 14/15 
+			  Verifying  : jansson-2.10-1.el7.x86_64                                                                                               15/15 
+
+			Installed:
+			  samba.x86_64 0:4.9.1-10.el7_7                                                                                                              
+
+			Dependency Installed:
+			  avahi-libs.x86_64 0:0.6.31-19.el7                cups-libs.x86_64 1:1.6.3-40.el7            jansson.x86_64 0:2.10-1.el7                    
+			  libldb.x86_64 0:1.4.2-1.el7                      libtalloc.x86_64 0:2.1.14-1.el7            libtdb.x86_64 0:1.3.16-1.el7                   
+			  libtevent.x86_64 0:0.9.37-1.el7                  libwbclient.x86_64 0:4.9.1-10.el7_7        pytalloc.x86_64 0:2.1.14-1.el7                 
+			  samba-client-libs.x86_64 0:4.9.1-10.el7_7        samba-common.noarch 0:4.9.1-10.el7_7       samba-common-libs.x86_64 0:4.9.1-10.el7_7      
+			  samba-common-tools.x86_64 0:4.9.1-10.el7_7       samba-libs.x86_64 0:4.9.1-10.el7_7        
+
+			Complete!
+
+	9.Verify Samba installation
+	# yum list samba
+		Loaded plugins: fastestmirror, ovl
+		Loading mirror speeds from cached hostfile
+		Installed Packages
+		samba.x86_64 
