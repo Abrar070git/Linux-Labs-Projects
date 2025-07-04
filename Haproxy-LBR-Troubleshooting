@@ -1,0 +1,69 @@
+QUESTION:
+
+xFusionCorp Industries has an application running on Nautlitus infrastructure in Stratos Datacenter. The monitoring tool recognised that there is an issue with the haproxy service on LBR server. That needs to fixed to make the application work properly.
+
+
+Troubleshoot and fix the issue, and make sure haproxy service is running on Nautilus LBR server. Once fixed, make sure you are able to access the website using StaticApp button on the top bar.
+
+ANSWER:
+
+ssh loki@stlb01  ---> redirect to the password
+sudo su -        ---> become a sudo
+
+systemctl status haproxy.service
+systemctl start haproxy.service
+
+# check logs
+
+journalctl -xeu haproxy.service
+
+-- Logs begin at Fri 2025-07-04 21:46:36 UTC, end at Fri 2025-07-04 21:52:54 UTC. --
+Jul 04 21:51:04 stlb01.stratos.xfusioncorp.com systemd[1]: Collecting haproxy.service
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com systemd[1]: Trying to enqueue job haproxy.service/start/replace
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com systemd[1]: Installed new job haproxy.service/start as 112
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com systemd[1]: Enqueued job haproxy.service/start as 112
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com systemd[1]: About to execute: /usr/sbin/haproxy-systemd-wrapper -f /
+etc/haproxy/haproxy.cfg -p /run/haproxy.pid $OPTIONS
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com systemd[1]: Forked /usr/sbin/haproxy-systemd-wrapper as 332
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com systemd[1]: haproxy.service changed dead -> running
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com systemd[1]: Job haproxy.service/start finished, result=done
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com systemd[1]: Started HAProxy Load Balancer.
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com systemd[332]: Executing: /usr/sbin/haproxy-systemd-wrapper -f /etc/h
+aproxy/haproxy.cfg -p /run/haproxy.pid
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com haproxy-systemd-wrapper[332]: haproxy-systemd-wrapper: executing /us
+r/sbin/haproxy -f /etc/haproxy/haproxy.cfg -p /run/haproxy.pid -Ds
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com haproxy-systemd-wrapper[332]: [ALERT] 184/215113 (333) : parsing [/e
+tc/haproxy/haproxy.cfg:50] : balance only supports 'roundrobin', 'static-rr', 'leastconn', 'source', 'uri', 'url_pa
+ram', 'hdr(name)' and 'rdp-cookie(name)' options.
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com haproxy-systemd-wrapper[332]: [ALERT] 184/215113 (333) : parsing [/e
+tc/haproxy/haproxy.cfg:57] : balance only supports 'roundrobin', 'static-rr', 'leastconn', 'source', 'uri', 'url_pa
+ram', 'hdr(name)' and 'rdp-cookie(name)' options.
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com haproxy-systemd-wrapper[332]: [ALERT] 184/215113 (333) : Error(s) fo
+und in configuration file : /etc/haproxy/haproxy.cfg
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com haproxy-systemd-wrapper[332]: [ALERT] 184/215113 (333) : Fatal error
+s found in configuration.
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com haproxy-systemd-wrapper[332]: haproxy-systemd-wrapper: exit, h
+aproxy RC=1
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com systemd[1]: Child 332 belongs to haproxy.service
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com systemd[1]: haproxy.service: main process exited, code=exited,
+ status=1/FAILURE
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com systemd[1]: haproxy.service changed running -> failed
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com systemd[1]: Unit haproxy.service entered failed state.
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com systemd[1]: haproxy.service failed.
+Jul 04 21:51:13 stlb01.stratos.xfusioncorp.com systemd[1]: haproxy.service: cgroup is empty
+
+# go into
+
+vim /etc/haproxy/haproxy.cfg 
+
+# change that from round to roundrobin
+
+backend static
+    balance     roundrobin
+    server      static 127.0.0.1:4331 check
+
+backend app
+    balance     roundrobin
+    server  app1 stapp01:8083 check
+    server  app2 stapp02:8083 check
+    server  app3 stapp03:8083 check
