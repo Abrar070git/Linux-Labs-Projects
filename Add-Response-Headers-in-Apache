@@ -1,0 +1,125 @@
+QUESTION:
+
+We are working on hardening Apache web server on all app servers. As a part of this process we want to add some of the Apache response headers for security purpose. We are testing the settings one by one on all app servers. As per details mentioned below enable these headers for Apache:
+
+
+Install httpd package on App Server 2 using yum and configure it to run on 3003 port, make sure to start its service.
+
+
+Create an index.html file under Apache's default document root i.e /var/www/html and add below given content in it.
+
+
+Welcome to the xFusionCorp Industries!
+
+
+Configure Apache to enable below mentioned headers:
+
+
+X-XSS-Protection header with value 1; mode=block
+
+
+X-Frame-Options header with value SAMEORIGIN
+
+
+X-Content-Type-Options header with value nosniff
+
+
+Note: You can test using curl on the given app server as LBR URL will not work for this task.
+
+SOLUTION:
+
+1. Login to App Server 2
+		ssh steve@stapp02
+
+		2. Install httpd Apache web server package
+		sudo yum install httpd -y
+
+		3. Edit httpd configuration file, add port and header configuration changes in the end of file
+		sudo vi /etc/httpd/conf/httpd.conf 
+				#Listen on Port 3000
+				Listen 3000
+
+				#Header Configurations	
+				Header set X-XSS-Protection "1; mode=block"
+				Header always append X-Frame-Options SAMEORIGIN
+				Header set X-Content-Type-Options nosniff
+		
+		4. check the configuartion changes
+		cat /etc/httpd/conf/httpd.conf |grep Listen
+				# Listen: Allows you to bind Apache to specific IP addresses and/or
+				# Change this to Listen on specific IP addresses as shown below to 
+				#Listen 12.34.56.78:80
+				#Listen 80
+				Listen 3000
+		
+		cat /etc/httpd/conf/httpd.conf |grep X
+				Header set X-XSS-Protection "1; mode=block"
+				Header always append X-Frame-Options SAMEORIGIN
+				Header set X-Content-Type-Options nosniff
+		
+		cat /etc/httpd/conf/httpd.conf |grep Header
+				#Header Configurations
+				Header set X-XSS-Protection "1; mode=block"
+				Header always append X-Frame-Options SAMEORIGIN
+				Header set X-Content-Type-Options nosniff
+
+		5. Edit index.html file
+		sudo vi /var/www/html/index.html
+				Welcome to the xFusionCorp Industries!
+
+		ls -ahl /var/www/html
+				total 12K
+				drwxr-xr-x 2 root root 4.0K Jan 24 16:20 .
+				drwxr-xr-x 4 root root 4.0K Jan 24 16:16 ..
+				-rw-r--r-- 1 root root   69 Jan 24 16:20 index.html
+
+		6. Start Apache web server service and check status
+		sudo systemctl start httpd
+		
+		sudo systemctl status httpd
+				● httpd.service - The Apache HTTP Server
+				   Loaded: loaded (/usr/lib/systemd/system/httpd.service; disabled; vendor preset: disabled)
+				   Active: active (running) since Mon 2022-01-24 16:25:56 UTC; 7s ago
+				     Docs: man:httpd(8)
+				           man:apachectl(8)
+				 Main PID: 808 (httpd)
+				   Status: "Processing requests..."
+				   CGroup: /docker/86ba0bd645f0a20cf7b27e3170432749c55f5b8cc39710538ac978dc448ddb5f/system.slice/httpd.service
+				           ├─808 /usr/sbin/httpd -DFOREGROUND
+				           ├─809 /usr/sbin/httpd -DFOREGROUND
+				           ├─810 /usr/sbin/httpd -DFOREGROUND
+				           ├─811 /usr/sbin/httpd -DFOREGROUND
+				           ├─812 /usr/sbin/httpd -DFOREGROUND
+				           └─813 /usr/sbin/httpd -DFOREGROUND
+
+				Jan 24 16:25:56 stapp02.stratos.xfusioncorp.com systemd[808]: Executing: /usr/sbin/httpd -DFOREGROUND
+				Jan 24 16:25:56 stapp02.stratos.xfusioncorp.com httpd[808]: AH00558: httpd: Could not reliably determine the server's fully qualifie...essage
+				Jan 24 16:25:56 stapp02.stratos.xfusioncorp.com systemd[1]: Got notification message for unit httpd.service
+				Jan 24 16:25:56 stapp02.stratos.xfusioncorp.com systemd[1]: httpd.service: Got notification message from PID 808 (READY=1, STATUS=Pr...D=808)
+				Jan 24 16:25:56 stapp02.stratos.xfusioncorp.com systemd[1]: httpd.service: got MAINPID=808
+				Jan 24 16:25:56 stapp02.stratos.xfusioncorp.com systemd[1]: httpd.service: got READY=1
+				Jan 24 16:25:56 stapp02.stratos.xfusioncorp.com systemd[1]: httpd.service changed start -> running
+				Jan 24 16:25:56 stapp02.stratos.xfusioncorp.com systemd[1]: Job httpd.service/start finished, result=done
+				Jan 24 16:25:56 stapp02.stratos.xfusioncorp.com systemd[1]: Started The Apache HTTP Server.
+				Jan 24 16:25:56 stapp02.stratos.xfusioncorp.com systemd[1]: httpd.service: got STATUS=Processing requests...
+				Hint: Some lines were ellipsized, use -l to show in full.
+		
+		7.Validate by using curl to fetch webpage
+		curl http://localhost:3000
+				Welcome to the xFusionCorp Industries!
+		
+		curl -i http://localhost:3000
+				HTTP/1.1 200 OK
+				Date: Mon, 24 Jan 2022 16:27:03 GMT
+				Server: Apache/2.4.6 (CentOS)
+				X-Frame-Options: SAMEORIGIN
+				Last-Modified: Mon, 24 Jan 2022 16:26:47 GMT
+				ETag: "27-5d6566f588809"
+				Accept-Ranges: bytes
+				Content-Length: 39
+				X-XSS-Protection: 1; mode=block
+				X-Content-Type-Options: nosniff
+				Content-Type: text/html; charset=UTF-8
+
+				Welcome to the xFusionCorp Industries!
+
