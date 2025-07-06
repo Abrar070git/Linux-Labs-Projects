@@ -36,8 +36,8 @@ SOLUTION:
 
 		3. Edit httpd configuration file, add port and header configuration changes in the end of file
 		sudo vi /etc/httpd/conf/httpd.conf 
-				#Listen on Port 3000
-				Listen 3000
+				#Listen on Port 3003
+				Listen 3003
 
 				#Header Configurations	
 				Header set X-XSS-Protection "1; mode=block"
@@ -50,7 +50,7 @@ SOLUTION:
 				# Change this to Listen on specific IP addresses as shown below to 
 				#Listen 12.34.56.78:80
 				#Listen 80
-				Listen 3000
+				Listen 3003
 		
 		cat /etc/httpd/conf/httpd.conf |grep X
 				Header set X-XSS-Protection "1; mode=block"
@@ -67,11 +67,6 @@ SOLUTION:
 		sudo vi /var/www/html/index.html
 				Welcome to the xFusionCorp Industries!
 
-		ls -ahl /var/www/html
-				total 12K
-				drwxr-xr-x 2 root root 4.0K Jan 24 16:20 .
-				drwxr-xr-x 4 root root 4.0K Jan 24 16:16 ..
-				-rw-r--r-- 1 root root   69 Jan 24 16:20 index.html
 
 		6. Start Apache web server service and check status
 		sudo systemctl start httpd
@@ -105,10 +100,10 @@ SOLUTION:
 				Hint: Some lines were ellipsized, use -l to show in full.
 		
 		7.Validate by using curl to fetch webpage
-		curl http://localhost:3000
+		curl http://localhost:3003
 				Welcome to the xFusionCorp Industries!
 		
-		curl -i http://localhost:3000
+		curl -i http://localhost:3003
 				HTTP/1.1 200 OK
 				Date: Mon, 24 Jan 2022 16:27:03 GMT
 				Server: Apache/2.4.6 (CentOS)
