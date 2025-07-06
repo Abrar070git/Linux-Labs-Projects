@@ -1,0 +1,111 @@
+QUESTION:
+
+The production support team of xFusionCorp Industries is working on developing some bash scripts to automate different day to day tasks. One is to create a bash script for taking websites backup. They have a static website running on App Server 3 in Stratos Datacenter, and they need to create a bash script named official_backup.sh which should accomplish the following tasks. (Also remember to place the script under /scripts directory on App Server 3).
+
+
+a. Create a zip archive named xfusioncorp_official.zip of /var/www/html/official directory.
+
+b. Save the archive in /backup/ on App Server 3. This is a temporary storage, as backups from this location will be clean on weekly basis. Therefore, we also need to save this backup archive on Nautilus Backup Server.
+
+c. Copy the created archive to Nautilus Backup Server server in /backup/ location.
+
+d. Please make sure script won't ask for password while copying the archive file. Additionally, the respective server user (for example, tony in case of App Server 1) must be able to run it.
+
+SOLUTION:
+
+
+1.Login to app server 1
+		 ssh banner@stapp03
+
+		2. Create the bash script
+		cd /scripts/
+
+		ls -ahl
+			total 8.0K
+			drwxrwxrwx 2 root root 4.0K Jan 28 06:59 .
+			drwxr-xr-x 1 root root 4.0K Jan 28 06:59 ..
+
+		vi official_backup.sh
+			
+			#! /bin/bash
+			
+			zip -r /backup/xfusioncorp_official.zip /var/www/html/official
+			
+			scp /backup/xfusioncorp_official.zip clint@stbkp01:/backup
+
+		cat /scripts/official_backup.sh 
+			#! /bin/bash
+
+			zip -r /backup/xfusioncorp_media.zip /var/www/html/official
+
+			scp /backup/xfusioncorp_official.zip clint@stbkp01:/backup
+
+
+		3. Create password-less login to backup server using key-pair
+		ssh-keygen 
+				Generating public/private rsa key pair.
+				Enter file in which to save the key (/home/root/.ssh/id_rsa): 
+				Created directory '/home/root/.ssh'.
+				Enter passphrase (empty for no passphrase): 
+				Enter same passphrase again: 
+				Your identification has been saved in /home/root/.ssh/id_rsa.
+				Your public key has been saved in /home/tony/.ssh/id_rsa.pub.
+				The key fingerprint is:
+				SHA256:qL0YvCn3EEL39VMf9jDs12BQxwtiDaTn5DyKO2n+8KE banner@stapp01.stratos.xfusioncorp.com
+				The key's randomart image is:
+				+---[RSA 2048]----+
+				|          .o+....|
+				|          .o = ..|
+				|  . .   ...oo X .|
+				| . . . o .*. = B.|
+				|  . . o S o=  o +|
+				|   o +  . ...  . |
+				|    = .o.o       |
+				|  . .* == .      |
+				|   o+.=Eoo       |
+				+----[SHA256]-----+
+
+
+		ssh-copy-id clint@stbkp01
+				/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/tony/.ssh/id_rsa.pub"
+				The authenticity of host 'stbkp01 (172.16.238.16)' can't be established.
+				ECDSA key fingerprint is SHA256:qummShb1MtTGDQrZOj4nbUBI2G1DSooSSRI0rtBukCg.
+				ECDSA key fingerprint is MD5:c3:3f:41:45:1e:73:13:5b:fb:2b:43:33:e0:a5:74:f8.
+				Are you sure you want to continue connecting (yes/no)? yes
+				/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
+				/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
+				clint@stbkp01's password: 
+
+				Number of key(s) added: 1
+
+				Now try logging into the machine, with:   "ssh 'clint@stbkp01'"
+				and check to make sure that only the key(s) you wanted were added.
+
+		4. Verify passwordless login to backup server
+		ssh clint@stbkp01
+			[clint@stbkp01 ~]$ 
+			[clint@stbkp01 ~]$ 
+			[clint@stbkp01 ~]$ logout
+			Connection to stbkp01 closed.
+
+		5. Run the bash script
+		sh /scripts/media_backup.sh 
+			  adding: var/www/html/official/ (stored 0%)
+			  adding: var/www/html/media/index.html (stored 0%)
+			  adding: var/www/html/media/.gitkeep (stored 0%)
+			xfusioncorp_media.zip                                                                                      100%  595     1.6MB/s   00:00    
+
+		6. Verify the backups created on local as well as backup server
+		ls -ahl /backup
+			total 12K
+			drwxrwxrwx 2 root root 4.0K Jan 28 07:05 .
+			drwxr-xr-x 1 root root 4.0K Jan 28 06:59 ..
+			-rw-rw-r-- 1 banner banner  595 Jan 28 07:05 xfusioncorp_media.zip
+
+		ssh clint@stbkp01
+
+		[clint@stbkp01 ~]$ls -ahl /backup/
+							total 12K
+							drwxrwxrwx 2 root  root  4.0K Jan 28 07:05 .
+							drwxr-xr-x 1 root  root  4.0K Jan 28 06:59 ..
+							-rw-rw-r-- 1 clint clint  595 Jan 28 07:05 xfusioncorp_official.zip
