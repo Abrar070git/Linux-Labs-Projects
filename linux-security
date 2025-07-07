@@ -1,0 +1,73 @@
+QUESTION:
+
+We have a backup management application UI hosted on Nautilus's backup server in Stratos DC. That backup management application code is deployed under Apache on the backup server itself, and Nginx is running as a reverse proxy on the same server. Apache and Nginx ports are 6300 and 8095, respectively. We have iptables firewall installed on this server. Make the appropriate changes to fulfill the requirements mentioned below:
+
+
+We want to open all incoming connections to Nginx's port and block all incoming connections to Apache's port. Also make sure rules are permanent.
+
+SOLUTION:
+
+ssh clint@stbkp01
+The authenticity of host 'stbkp01 (172.16.238.16)' can't be established.
+ED25519 key fingerprint is SHA256:iDG7J0SZ7hCbNKnNn8/5AjFOFIzkeR1sCsJii+oNG9M.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'stbkp01' (ED25519) to the list of known hosts.
+clint@stbkp01's password: 
+[clint@stbkp01 ~]$ sudo -i
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+[sudo] password for clint: 
+[root@stbkp01 ~]# systemctl status iptables
+● iptables.service - IPv4 firewall with iptables
+   Loaded: loaded (/usr/lib/systemd/system/iptables.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+
+ss -ntlp|grep http
+			LISTEN     0      511          *:8084                     *:*                   users:(("httpd",pid=640,fd=3),("httpd",pid=639,fd=3),("httpd",pid=638,fd=3),("httpd",pid=637,fd=3),("httpd",pid=636,fd=3),("httpd",pid=635,fd=3))
+
+
+ss -ntlp|grep nginx
+			LISTEN     0      511          *:80                    *:*                   users:(("nginx",pid=693,fd=6),("nginx",pid=692,fd=6),("nginx",pid=691,fd=6),("nginx",pid=6	90,fd=6),("nginx",pid=689,fd=6),("nginx",pid=688,fd=6),("nginx",pid=687,fd=6),("nginx",pid=686,fd=6),("nginx",pid=685,fd=6),("nginx",pid=684,fd=6),("nginx",pid=683,fd=6),("nginx",pid=682,fd=6),("nginx",pid=681,fd=6),("nginx",pid=680,fd=6),("nginx",pid=679,fd=6),("nginx",pid=678,fd=6),("nginx",pid=677,fd=6),("nginx",pid=676,fd=6),("nginx",pid=675,fd=6),("nginx",pid=674,fd=6),("nginx",pid=673,fd=6),("nginx",pid=672,fd=6),("nginx",pid=671,fd=6),("nginx",pid=670,fd=6),("nginx",pid=669,fd=6),("nginx",pid=668,fd=6),("nginx",pid=667,fd=6),("nginx",pid=666,fd=6),("nginx",pid=665,fd=6),("nginx",pid=664,fd=6),("nginx",pid=663,fd=6),("nginx",pid=662,fd=6),("nginx",pid=661,fd=6),("nginx",pid=660,fd=6),("nginx",pid=659,fd=6),("nginx",pid=658,fd=6),("nginx",pid=657,fd=6))
+
+
+# systemctl start iptables
+
+		# systemctl status iptables
+			● iptables.service - IPv4 firewall with iptables
+			   Loaded: loaded (/usr/lib/systemd/system/iptables.service; disabled; vendor preset: disabled)
+			   Active: active (exited) since Fri 2022-02-04 13:37:13 UTC; 7s ago
+			  Process: 778 ExecStart=/usr/libexec/iptables/iptables.init start (code=exited, status=0/SUCCESS)
+			 Main PID: 778 (code=exited, status=0/SUCCESS)
+
+			Feb 04 13:37:13 stbkp01.stratos.xfusioncorp.com systemd[1]: iptables.service changed dead -> start
+			Feb 04 13:37:13 stbkp01.stratos.xfusioncorp.com systemd[1]: Starting IPv4 firewall with iptables...
+			Feb 04 13:37:13 stbkp01.stratos.xfusioncorp.com systemd[778]: Executing: /usr/libexec/iptables/iptables.init start
+			Feb 04 13:37:13 stbkp01.stratos.xfusioncorp.com iptables.init[778]: iptables: Applying firewall rules: [  OK  ]
+			Feb 04 13:37:13 stbkp01.stratos.xfusioncorp.com systemd[1]: Child 778 belongs to iptables.service
+			Feb 04 13:37:13 stbkp01.stratos.xfusioncorp.com systemd[1]: iptables.service: main process exited, code=exited, status=0/SUCCESS
+			Feb 04 13:37:13 stbkp01.stratos.xfusioncorp.com systemd[1]: iptables.service changed start -> exited
+			Feb 04 13:37:13 stbkp01.stratos.xfusioncorp.com systemd[1]: Job iptables.service/start finished, result=done
+			Feb 04 13:37:13 stbkp01.stratos.xfusioncorp.com systemd[1]: Started IPv4 firewall with iptables.
+			Feb 04 13:37:13 stbkp01.stratos.xfusioncorp.com systemd[1]: iptables.service: cgroup is empty
+
+Allow Incoming Connections to Nginx (Port 8095)
+
+sudo iptables -A INPUT -p tcp --dport 8095 -j ACCEPT
+
+Block Incoming Connections to Apache (Port 6300)
+sudo iptables -A INPUT -p tcp --dport 6300 -j REJECT
+
+sudo service iptables save
+
+Verify the rules
+
+sudo iptables -L -n -v
+
+
