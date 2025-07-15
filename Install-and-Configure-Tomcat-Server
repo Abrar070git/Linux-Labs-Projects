@@ -1,0 +1,79 @@
+QUESTION:
+
+The Nautilus application development team recently finished the beta version of one of their Java-based applications, which they are planning to deploy on one of the app servers in Stratos DC. After an internal team meeting, they have decided to use the tomcat application server. Based on the requirements mentioned below complete the task:
+
+a. Install tomcat server on App Server 2.
+
+b. Configure it to run on port 6200.
+
+c. There is a ROOT.war file on Jump host at location /tmp.
+
+
+Deploy it on this tomcat server and make sure the webpage works directly on base URL i.e curl http://stapp02:6200
+
+SOLUTION:
+
+ssh steve@stapp02
+sudo -i 
+
+yum install tomcat -y
+
+
+#open another terminal from the top and cd /tmp/
+
+ls -la | grep -i ROOT.war
+
+scp ROOT.war steve@stapp02:/tmp
+
+#now go back to steve terminal
+
+cd /etc/tomcat/
+
+vi server.xml
+<Connector port="6200" protocol="HTTP/1.1"   <-------------- change the port there
+               connectionTimeout="20000"
+               redirectPort="8443"
+               maxParameterCount="1000"
+               />
+
+ls -la 
+
+ls -la 
+total 80
+drwxrwxrwt 1 root  root   4096 Jul 15 17:07 .
+drwxr-xr-x 1 root  root  36864 Jul 15 17:05 ..
+drwxrwxrwt 2 root  root   4096 Jul 15 16:50 .ICE-unix
+drwxrwxrwt 2 root  root   4096 Jul 15 16:50 .X11-unix
+drwxrwxrwt 2 root  root   4096 Jul 15 16:50 .XIM-unix
+drwxrwxrwt 2 root  root   4096 Jul 15 16:50 .font-unix
+-rw-r--r-- 1 steve steve  4529 Jul 15 17:03 ROOT.war
+drwxr-xr-x 2 root  root   4096 Jul 15 17:00 hsperfdata_root
+drwx------ 3 root  root   4096 Jul 15 16:50 systemd-private-63f02150f5c74cfb831d050140c1d479-dbus-broker.service-CYTE7g
+drwx------ 3 root  root   4096 Jul 15 16:50 systemd-private-63f02150f5c74cfb831d050140c1d479-systemd-logind.service-naZHEk
+
+mv ROOT.war /var/lib/tomcat/webapps/
+
+
+systemctl restart tomcat
+
+systemctl status tomcat
+
+curl http://stapp02:6200
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>SampleWebApp</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <h2>Welcome to xFusionCorp Industries!</h2>
+        <br>
+    
+    </body>
+</html>
