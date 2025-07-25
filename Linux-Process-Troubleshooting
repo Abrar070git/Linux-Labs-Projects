@@ -1,0 +1,27 @@
+QUESTION:
+
+The production support team of xFusionCorp Industries has deployed some of the latest monitoring tools to keep an eye on every service, application, etc. running on the systems. One of the monitoring systems reported about Apache service unavailability on one of the app servers in Stratos DC.
+
+Identify the faulty app host and fix the issue. Make sure Apache service is up and running on all app hosts. They might not hosted any code yet on these servers so you need not to worry about if Apache isn't serving any pages or not, just make sure service is up and running. Also, make sure Apache is running on port 6100 on all app servers.
+
+SOLUTION:
+
+ssh tony@stapp01
+sudo -i
+
+sudo vim /etc/httpd/conf/httpd.conf
+Listen 6100    				# <------------- make sure it is listening on it
+
+sudo systemctl restart httpd
+
+sudo netstat -tulnp | grep 6100
+tcp        0      0 127.0.0.1:6100          0.0.0.0:*               LISTEN      649/sendmail: accept
+
+sudo systemctl stop sendmail
+sudo systemctl disable sendmail
+
+sudo netstat -tulnp | grep 6100
+
+sudo systemctl start httpd
+sudo systemctl status httpd
+ 
