@@ -1,0 +1,64 @@
+QUESTION:
+
+xFusionCorp Industries has hosted several static websites on Nautilus Application Servers in Stratos DC. There are some confidential directories in the document root that need to be password protected. Since they are using Apache for hosting the websites, the production support team has decided to use .htaccess with basic auth. There is a website that needs to be uploaded to /var/www/html/sysops on Nautilus App Server 3. However, we need to set up the authentication before that.
+
+1. Create /var/www/html/sysops direcotry if doesn't exist.
+
+2. Add a user yousuf in htpasswd and set its password to B4zNgHA7Ya.
+
+3. There is a file /tmp/index.html present on Jump Server. Copy the same to the directory you created, please make sure default document root should remain /var/www/html. Also website should work on URL http://<app-server-hostname>:8080/sysops/
+
+SOLUTION:
+
+thor@jumphost ~$ scp /tmp/index.html banner@stapp03:/tmp/
+
+ssh banner@stapp03
+
+sudo -i
+
+mkdir /var/www/html/sysops
+
+useradd yousuf
+
+mv /tmp/index.html /var/www/html/sysops/
+
+ls /var/www/html/
+index.html  sysops
+
+getent passwd | grep -i yousuf
+yousuf:x:1002:1002::/home/yousuf:/bin/bash
+
+htpasswd -c /var/www/html/.htaccess yousuf
+
+systemctl status httpd
+○ httpd.service - The Apache HTTP Server
+     Loaded: loaded (/usr/lib/systemd/system/httpd.service; disabled; preset: disabled)
+     Active: inactive (dead)
+       Docs: man:httpd.service(8)
+
+Jul 25 21:59:03 stapp03.stratos.xfusioncorp.com systemd[1]: httpd.service: Collecting.
+[root@stapp03 ~]# systemctl enable --now httpd
+Created symlink /etc/systemd/system/multi-user.target.wants/httpd.service → /usr/lib/systemd/system/httpd.service.
+
+exit
+
+thor@jumphost ~$ curl http://stapp03:8080/sysops/
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+ <head>
+  <title>Index of /sysops</title>
+ </head>
+ <body>
+<h1>Index of /sysops</h1>
+  <table>
+   <tr><th valign="top"><img src="/icons/blank.gif" alt="[ICO]"></th><th><a href="?C=N;O=D">Name</a></th><th><a href="?C=M;O=A">Last modified</a></th><th><a href="?C=S;O=A">Size</a></th><th><a href="?C=D;O=A">Description</a></th></tr>
+   <tr><th colspan="5"><hr></th></tr>
+<tr><td valign="top"><img src="/icons/back.gif" alt="[PARENTDIR]"></td><td><a href="/">Parent Directory</a>       </td><td>&nbsp;</td><td align="right">  - </td><td>&nbsp;</td></tr>
+   <tr><th colspan="5"><hr></th></tr>
+</table>
+</body></html>
+thor@jumphost ~$ curl -Ik http://stapp03:8080/sysops/
+HTTP/1.1 200 OK
+Date: Fri, 25 Jul 2025 22:00:55 GMT
+Server: Apache/2.4.57 (CentOS Stream)
+Content-Type: text/html;charset=ISO-8859-1
